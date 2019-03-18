@@ -11,46 +11,39 @@
    </rect>
   </property>
   <property name="windowTitle">
-   <string>MainWindow</string>
+   <string>考勤系统</string>
   </property>
   <widget class="QWidget" name="centralWidget">
    <layout class="QVBoxLayout" name="verticalLayout">
     <item>
-     <widget class="QStackedWidget" name="stackedWidget">
+     <widget class="QTabWidget" name="tabWidget">
       <property name="currentIndex">
-       <number>0</number>
+       <number>1</number>
       </property>
-      <widget class="QWidget" name="page">
-       <widget class="QTableWidget" name="tableWidget">
-        <property name="geometry">
-         <rect>
-          <x>50</x>
-          <y>50</y>
-          <width>256</width>
-          <height>192</height>
-         </rect>
-        </property>
-       </widget>
+      <widget class="QWidget" name="daka">
+       <attribute name="title">
+        <string>打卡</string>
+       </attribute>
       </widget>
-      <widget class="QWidget" name="page_2">
+      <widget class="QWidget" name="info">
+       <attribute name="title">
+        <string>个人信息</string>
+       </attribute>
        <layout class="QVBoxLayout" name="verticalLayout_2">
         <item>
-         <widget class="QLabel" name="label">
-          <property name="layoutDirection">
-           <enum>Qt::LeftToRight</enum>
-          </property>
+         <widget class="QTableWidget" name="table"/>
+        </item>
+        <item>
+         <widget class="QPushButton" name="adduser">
           <property name="text">
-           <string>当前无图像输入</string>
-          </property>
-          <property name="alignment">
-           <set>Qt::AlignCenter</set>
+           <string>添加用户</string>
           </property>
          </widget>
         </item>
         <item>
-         <widget class="QPushButton" name="pushButton_3">
+         <widget class="QPushButton" name="deleteuser">
           <property name="text">
-           <string>识别打卡</string>
+           <string>删除用户</string>
           </property>
          </widget>
         </item>
@@ -60,7 +53,6 @@
     </item>
    </layout>
   </widget>
-  <widget class="QStatusBar" name="statusBar"/>
  </widget>
  <layoutdefault spacing="6" margin="11"/>
  <resources/>

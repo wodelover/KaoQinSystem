@@ -2,10 +2,9 @@
 #define MAINWINDOW_H
 
 #include <QMainWindow>
-#include <QSqlDatabase>
-#include <QSqlError>
-#include <QSqlQuery>
 
+#include <login.h>
+#include <QTimer>
 
 const QString db_ip = "localhost";
 const QString db_username = "root";
@@ -25,11 +24,31 @@ public:
     ~MainWindow();
 
 private:
-    bool init();
+    void init();
+    void updateAllUser();
+    void updateSingle();
+    QStringList getAllHeader();
 
+private slots:
+    void loginSucess(QString id);
+    void quitsystem();
+    void timedone();
+
+    void on_table_cellChanged(int row, int column);
+
+    void on_table_cellClicked(int row, int column);
+
+    void on_adduser_clicked();
+
+    void on_deleteuser_clicked();
 
 private:
     Ui::MainWindow *ui;
+    Login login;
+    QTimer m_timer;
+    QString m_current_id;
+    bool m_update = false;
+    QString m_table_currentpress_value;
 };
 
 #endif // MAINWINDOW_H
