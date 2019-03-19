@@ -51,6 +51,7 @@ private:
     bool m_update = false;
     bool m_isAdmin = false;
     QString m_table_currentpress_value;
+    int m_current_index = -1;
 };
 
 #endif // MAINWINDOW_H

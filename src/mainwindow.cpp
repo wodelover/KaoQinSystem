@@ -239,6 +239,7 @@ void MainWindow::on_table_cellChanged(int row, int column)
 void MainWindow::on_table_cellClicked(int row, int column)
 {
     m_table_currentpress_value = ui->table->item(row,column)->text();
+    m_current_index = row;
 }
 
 void MainWindow::on_adduser_clicked()
@@ -252,5 +253,40 @@ void MainWindow::on_adduser_clicked()
 
 void MainWindow::on_deleteuser_clicked()
 {
-    updateAllUser();
+    if(!m_isAdmin){
+        QMessageBox::warning(this,"删除用户","您没有权限删除用户");
+        return;
+    }
+
+    if(m_current_index<0){
+        QMessageBox::warning(this,"删除用户","请点击要删除的用户");
+        return;
+    }
+
+    QString userid = ui->table->item(m_current_index,1)->text();
+
+    QMessageBox msgBox;
+    msgBox.setInformativeText("确定删除该用户?");
+    msgBox.setStandardButtons(QMessageBox::Cancel | QMessageBox::Ok);
+    msgBox.setDefaultButton(QMessageBox::Ok);
+    int ret = msgBox.exec();
+
+    switch (ret) {
+    case QMessageBox::Ok:
+    {
+        QString sql_str = "delete from user where userid = '"+ userid +"';";
+        QSqlQuery query(sql_str);
+        if(!query.exec()){
+            QMessageBox::warning(this,"删除用户","删除出现未知错误");
+        }
+        updateAllUser();
+        m_current_index = -1;
+        break;
+    }
+    case QMessageBox::Cancel:
+        break;
+    default:
+        // should never be reached
+        break;
+    }
 }
