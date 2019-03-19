@@ -22,6 +22,9 @@ private slots:
 
     void on_faceselect_clicked();
 
+signals:
+    void addUserDone();
+
 private:
     Ui::AddUser *ui;
 };

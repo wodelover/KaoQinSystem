@@ -18,6 +18,7 @@ MainWindow::MainWindow(QWidget *parent) :
     connect(&login,SIGNAL(loginSucess(QString)),this,SLOT(loginSucess(QString)));
     connect(&login,SIGNAL(quitsystem()),this,SLOT(quitsystem()));
     connect(&m_timer,SIGNAL(timeout()),this,SLOT(timedone()));
+
     init();
 }
 
@@ -49,30 +50,34 @@ void MainWindow::init()
 void MainWindow::updateAllUser()
 {
     m_update = false;
-    QStringList list = getAllHeader();
     ui->table->clear();
+
+    QStringList list = getAllHeader();
 
     ui->table->setColumnCount(list.size());
     ui->table->setHorizontalHeaderLabels(list);
 
     QSqlQuery query(sql_all_infos);
+    int cnt = 0 ;
     while (query.next()) {
-        int count = ui->table->rowCount();
-        ui->table->insertRow(count);
+        if(cnt==ui->table->rowCount())
+            ui->table->insertRow(cnt);
+
         for(int i = 0; i < list.size(); i++){
             QString temp = query.value(i).toString();
 
             if(i==0){
                 if(temp=="0"){
-                    ui->table->setItem(count,i,new QTableWidgetItem("管理员"));
+                    ui->table->setItem(cnt,i,new QTableWidgetItem("管理员"));
                 }
                 else if (temp=="1") {
-                    ui->table->setItem(count,i,new QTableWidgetItem("普通用户"));
+                    ui->table->setItem(cnt,i,new QTableWidgetItem("普通用户"));
                 }
             }else{
-                ui->table->setItem(count,i,new QTableWidgetItem(temp));
+                ui->table->setItem(cnt,i,new QTableWidgetItem(temp));
             }
         }
+        cnt++;
     }
     m_update = true;
 }
@@ -80,9 +85,10 @@ void MainWindow::updateAllUser()
 void MainWindow::updateSingle()
 {
     m_update = false;
+    ui->table->clear();
 
     QStringList list = getAllHeader();
-    ui->table->clear();
+
     ui->table->setColumnCount(list.size());
     ui->table->setHorizontalHeaderLabels(list);
 
@@ -91,23 +97,26 @@ void MainWindow::updateSingle()
     sql_str += "';";
 
     QSqlQuery query(sql_str);
+    int cnt = 0 ;
     while (query.next()) {
-        int count = ui->table->rowCount();
-        ui->table->insertRow(count);
+        if(cnt==ui->table->rowCount())
+            ui->table->insertRow(cnt);
+
         for(int i = 0; i < list.size(); i++){
             QString temp = query.value(i).toString();
 
             if(i==0){
                 if(temp=="0"){
-                    ui->table->setItem(count,i,new QTableWidgetItem("管理员"));
+                    ui->table->setItem(cnt,i,new QTableWidgetItem("管理员"));
                 }
                 else if (temp=="1") {
-                    ui->table->setItem(count,i,new QTableWidgetItem("普通用户"));
+                    ui->table->setItem(cnt,i,new QTableWidgetItem("普通用户"));
                 }
             }else{
-                ui->table->setItem(count,i,new QTableWidgetItem(temp));
+                ui->table->setItem(cnt,i,new QTableWidgetItem(temp));
             }
         }
+        cnt++;
     }
     m_update = true;
 }
@@ -135,8 +144,10 @@ void MainWindow::loginSucess(QString id)
         type = query.value(0).toString().toInt();
     }
     if(type==0){
+        m_isAdmin = true;
         updateAllUser();
     }else {
+        m_isAdmin = false;
         updateSingle();
     }
 }
@@ -152,32 +163,59 @@ void MainWindow::timedone()
     this->close();
 }
 
+void MainWindow::updateUserInfo()
+{
+    updateAllUser();
+}
+
 void MainWindow::on_table_cellChanged(int row, int column)
 {
     if(m_update){
         QString now_str = ui->table->item(row,column)->text();
         if(column==0){// 更新身份
-            if(now_str=="管理员"){
-                QString sql_str = "UPDATE user set type = 0 where userid = '";
-                sql_str += m_current_id;
-                sql_str += "' and type = 0;";
-                QSqlQuery query(sql_str);
-                if(!query.exec()){
-                    QMessageBox::warning(this,"更新错误","更新失败,数据库错误.");
+            if(m_isAdmin){
+                if(now_str=="管理员"){
+                    QString sql_str = "UPDATE user set type = 0 where userid = '";
+                    sql_str += ui->table->item(row,1)->text();
+                    sql_str += "';";
+                    QSqlQuery query(sql_str);
+                    if(!query.exec()){
+                        QMessageBox::warning(this,"更新错误","更新失败,数据库错误.");
+                    }
+                }else if(now_str=="普通用户"){
+                    QString sql_str = "UPDATE user set type = 1 where userid = '";
+                    sql_str += ui->table->item(row,1)->text();
+                    sql_str += "';";
+                    QSqlQuery query(sql_str);
+                    if(!query.exec()){
+                        QMessageBox::warning(this,"更新错误","更新失败,数据库错误.");
+                    }
                 }
-            }else if(now_str=="普通用户"){
-                QString sql_str = "UPDATE user set type = 1 where userid = '";
-                sql_str += m_current_id;
-                sql_str += "' and type = 0;";
+            }
+            else{
+                updateSingle();
+                QMessageBox::warning(this,"输入错误","您当前身份为普通用户");
+            }
+        }
+        else if (column==1) { //更新ID
+            if(m_isAdmin){
+                QStringList list = getAllHeader();
+
+                QString sql_str = "UPDATE user set ";
+                sql_str += list[column];
+                sql_str += " = '" + now_str + "' where userid = '";
+                sql_str += m_table_currentpress_value;
+                sql_str += "';";
                 QSqlQuery query(sql_str);
                 if(!query.exec()){
-                    QMessageBox::warning(this,"更新错误","更新失败,数据库错误.");
+                    QMessageBox::warning(this,"更新错误","ID 已经存在.");
                 }
             }else{
-                ui->table->setItem(row,column,new QTableWidgetItem(m_table_currentpress_value));
-                QMessageBox::warning(this,"输入错误","录入身份错误,只能为管理员或者普通用户");
+                updateSingle();
+                QMessageBox::warning(this,"更新错误","您没有权限修改ID");
             }
-        }else{
+        }
+        else{
             QStringList list = getAllHeader();
 
             QString sql_str = "UPDATE user set ";
@@ -187,6 +225,11 @@ void MainWindow::on_table_cellChanged(int row, int column)
             sql_str += "';";
             QSqlQuery query(sql_str);
             if(!query.exec()){
+                if(m_isAdmin){
+                    updateAllUser();
+                }else {
+                    updateSingle();
+                }
                 QMessageBox::warning(this,"更新错误","更新失败,数据库错误.");
             }
         }
@@ -201,10 +244,13 @@ void MainWindow::on_table_cellClicked(int row, int column)
 void MainWindow::on_adduser_clicked()
 {
     AddUser adduser;
+
+    connect(&adduser,SIGNAL(addUserDone()),this,SLOT(updateUserInfo()));
+
     adduser.exec();
 }
 
 void MainWindow::on_deleteuser_clicked()
 {
-
+    updateAllUser();
 }

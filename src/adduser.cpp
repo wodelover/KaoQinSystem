@@ -5,7 +5,7 @@
 #include <QSqlError>
 #include <QSqlQuery>
 #include <QMessageBox>
-
+#include <QDebug>
 
 AddUser::AddUser(QWidget *parent) :
     QDialog(parent),
@@ -49,8 +49,8 @@ void AddUser::on_add_clicked()
         return;
     }
     QString age = ui->age->text();
-    if(age==""){
-        QMessageBox::warning(this,"添加用户","用户年龄不能为空");
+    if(age.toInt() <= 0){
+        QMessageBox::warning(this,"添加用户","用户年龄设置错误");
         return;
     }
     QString facepath = ui->facepath->text();
@@ -58,25 +58,27 @@ void AddUser::on_add_clicked()
         QMessageBox::warning(this,"添加用户","用户年龄不能为空");
         return;
     }
-//    if(!facepath.endsWith(".png")||!facepath.endsWith(".jpg")){
-//        QMessageBox::warning(this,"添加用户","图片格式选择错误");
-//        return;
-//    }
+    if(!facepath.endsWith(".png")&&!facepath.endsWith(".jpg")&&!facepath.endsWith(".bmp")){
+        QMessageBox::warning(this,"添加用户","图片格式选择错误");
+        return;
+    }
 
     QString sex = ui->sex->currentText();
     int type = ui->type->currentIndex();
 
 
-    QString sql_add = "INSERT INTO `user` VALUES(" + QString::number(type) + "'"
+    QString sql_add = "INSERT INTO `user` VALUES(" + QString::number(type) + ",'"
             + userid + "','"
-            + username + ','
-            + passwd + ','
-            + age + ','
-            + sex +','
+            + username + "','"
+            + passwd + "','"
+            + age + "','"
+            + sex +"','"
             + facepath +" ');";
-
-    query.exec(sql_add);
-
+    if(!query.exec(sql_add)){
+        QMessageBox::information(this,"添加用户","添加用户出现错误");
+    }
+    emit addUserDone();
+    QMessageBox::information(this,"添加用户","添加成功");
 }
 
 void AddUser::on_faceselect_clicked()

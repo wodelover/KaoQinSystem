@@ -33,6 +33,7 @@ private slots:
     void loginSucess(QString id);
     void quitsystem();
     void timedone();
+    void updateUserInfo();
 
     void on_table_cellChanged(int row, int column);
 
@@ -48,6 +49,7 @@ private:
     QTimer m_timer;
     QString m_current_id;
     bool m_update = false;
+    bool m_isAdmin = false;
     QString m_table_currentpress_value;
 };
 
