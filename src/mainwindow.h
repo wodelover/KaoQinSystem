@@ -43,6 +43,8 @@ private slots:
 
     void on_deleteuser_clicked();
 
+    void on_dakaInfo_clicked();
+
 private:
     Ui::MainWindow *ui;
     Login login;

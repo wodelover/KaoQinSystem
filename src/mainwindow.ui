@@ -34,6 +34,13 @@
          <widget class="QTableWidget" name="table"/>
         </item>
         <item>
+         <widget class="QPushButton" name="dakaInfo">
+          <property name="text">
+           <string>查看打卡</string>
+          </property>
+         </widget>
+        </item>
+        <item>
          <widget class="QPushButton" name="adduser">
           <property name="text">
            <string>添加用户</string>

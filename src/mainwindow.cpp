@@ -7,6 +7,7 @@
 #include <QMessageBox>
 #include <QDialog>
 #include <adduser.h>
+#include <dakainfo.h>
 
 #include <QDebug>
 
@@ -289,4 +290,23 @@ void MainWindow::on_deleteuser_clicked()
         // should never be reached
         break;
     }
+}
+
+void MainWindow::on_dakaInfo_clicked()
+{
+    if(m_current_index<0){
+        QMessageBox::warning(this,"查看打卡","请点击要查看的打卡用户");
+        return;
+    }
+
+    QString userid = ui->table->item(m_current_index,1)->text();
+
+    if(userid!=m_current_id&&!m_isAdmin){
+        QMessageBox::warning(this,"查看打卡","您没有权限查看该用户打卡记录");
+        return;
+    }
+
+    DakaInfo dakainfo;
+    dakainfo.setUserId(userid,m_isAdmin);
+    dakainfo.exec();
 }

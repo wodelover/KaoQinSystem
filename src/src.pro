@@ -28,18 +28,21 @@ SOURCES += \
         main.cpp \
         mainwindow.cpp \
     login.cpp \
-    adduser.cpp
+    adduser.cpp \
+    dakainfo.cpp
 
 HEADERS += \
         mainwindow.h \
     sqlstr.h \
     login.h \
-    adduser.h
+    adduser.h \
+    dakainfo.h
 
 FORMS += \
         mainwindow.ui \
     login.ui \
-    adduser.ui
+    adduser.ui \
+    dakainfo.ui
 
 # Default rules for deployment.
 qnx: target.path = /tmp/$${TARGET}/bin
